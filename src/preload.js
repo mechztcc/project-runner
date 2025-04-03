@@ -4,7 +4,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  getFolders: () => ipcRenderer.invoke('get-folders')
+  getFolders: () => ipcRenderer.invoke('get-folders'),
+  runScript: (projectName, scriptName) => ipcRenderer.invoke("run-script", projectName, scriptName),
+  stopScript: (projectName) => ipcRenderer.invoke("stop-script", projectName),
 });
 
 

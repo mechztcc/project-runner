@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-3 px-5">
     <div class="col-span-3" v-for="(item, index) in folders" :key="index">
-      <CardProgram :name="item.name" :started="item.started" :type="item.type" />
+      <CardProgram :name="item.name" :started="item.started" :type="item.type" :scripts="item.scripts" />
     </div>
   </div>
 </template>
@@ -14,9 +14,6 @@ const folders = ref([]);
 
 onMounted(async () => {
   folders.value = await window.electronAPI.getFolders();
-
-  console.log(folders.value);
-  
 });
 </script>
 

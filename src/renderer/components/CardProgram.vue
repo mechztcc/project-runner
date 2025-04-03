@@ -23,15 +23,32 @@
     </div>
 
     <div class="flex items-center">
-      <font-awesome-icon
-        @click="onHandle()"
-        v-if="!started"
-        :icon="['fas', 'play']"
-        class="px-2 py-2 rounded-full hover:bg-zinc-200 cursor-pointer"
-      />
+      <div class="relative">
+        <font-awesome-icon
+          @click="onHandle()"
+          v-if="!started"
+          :icon="['fas', 'play']"
+          class="px-2 py-2 rounded-full hover:bg-zinc-200 cursor-pointer"
+        />
+
+        <div
+          v-if="showMenu"
+          class="absolute top-7 right-5 px-3 py-5 rounded-lg bg-zinc-50 z-10"
+        >
+          <div
+            @click="runScript(item)"
+            class="flex items-center my-2 cursor-pointer p-3 hover:bg-zinc-200 rounded-lg"
+            v-for="(item, index) in props.scripts"
+            :key="index"
+          >
+            <font-awesome-icon :icon="['fas', 'play']" class="mx-2" />
+            {{ item }}
+          </div>
+        </div>
+      </div>
 
       <font-awesome-icon
-       @click="onHandle()"
+        @click="stopScript(props.type)"
         :icon="['fas', 'pause']"
         class="px-2 py-2 rounded-full hover:bg-zinc-200 cursor-pointer"
         v-if="started"
@@ -51,12 +68,28 @@ const props = defineProps<{
   name: string;
   started: boolean;
   type: string;
+  scripts: [];
 }>();
 
-let started = ref(props.started);
+let showMenu = ref(false);
+let started = ref(false);
 
-function onHandle() {
-  started.value = !started.value;
+async function onHandle() {
+  showMenu.value = !showMenu.value;
+}
+
+async function runScript(script: string) {
+  if (props.type == "JS") {
+    window.electronAPI.runScript(props.name, script);
+    showMenu.value = false;
+    started.value = true;
+  }
+}
+
+async function stopScript() {
+  if (props.type == "JS") {
+    await window.electronAPI.stopScript(props.name);
+  }
 }
 </script>
 

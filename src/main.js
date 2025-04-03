@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const { runFromNodeEnv, stopScript } = require("./renderer/services/executor");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -37,16 +38,27 @@ function getFoldersInDev() {
       .filter((file) => fs.statSync(path.join(devPath, file)).isDirectory())
       .map((folder) => {
         const folderPath = path.join(devPath, folder);
-        const isJS = fs.existsSync(path.join(folderPath, 'package.json'));
-        const isPython = fs.existsSync(path.join(folderPath, 'manage.py'));
-        const isFlutter = fs.existsSync(path.join(folderPath, 'pubspec.yaml'))
+        const packageJsonPath = path.join(folderPath, "package.json");
+
+        const isJS = fs.existsSync(path.join(folderPath, "package.json"));
+        const isPython = fs.existsSync(path.join(folderPath, "manage.py"));
+        const isFlutter = fs.existsSync(path.join(folderPath, "pubspec.yaml"));
+
+        let scripts = [];
+        if (isJS) {
+          const packageJson = JSON.parse(
+            fs.readFileSync(packageJsonPath, "utf8")
+          );
+          scripts = packageJson.scripts ? Object.keys(packageJson.scripts) : [];
+        }
 
         return {
           name: folder,
           started: false,
-          type: isJS ? 'JS' : isPython ? 'PY' : isFlutter ? 'DART' : 'Unknown',
+          type: isJS ? "JS" : isPython ? "PY" : isFlutter ? "DART" : "Unknown",
+          scripts,
         };
-      })
+      });
 
     return folders;
   } catch (error) {
@@ -59,4 +71,12 @@ app.whenReady().then(createWindow);
 
 ipcMain.handle("get-folders", () => {
   return getFoldersInDev();
+});
+
+ipcMain.handle("run-script", (_event, projectName, scriptName) => {
+  return runFromNodeEnv(projectName, scriptName);
+});
+
+ipcMain.handle("stop-script", (_event, projectName) => {
+  return stopScript(projectName);
 });
