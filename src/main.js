@@ -34,7 +34,19 @@ function getFoldersInDev() {
   try {
     const folders = fs
       .readdirSync(devPath)
-      .filter((file) => fs.statSync(path.join(devPath, file)).isDirectory());
+      .filter((file) => fs.statSync(path.join(devPath, file)).isDirectory())
+      .map((folder) => {
+        const folderPath = path.join(devPath, folder);
+        const isJS = fs.existsSync(path.join(folderPath, 'package.json'));
+        const isPython = fs.existsSync(path.join(folderPath, 'manage.py'));
+        const isFlutter = fs.existsSync(path.join(folderPath, 'pubspec.yaml'))
+
+        return {
+          name: folder,
+          started: false,
+          type: isJS ? 'JS' : isPython ? 'PY' : isFlutter ? 'DART' : 'Unknown',
+        };
+      })
 
     return folders;
   } catch (error) {

@@ -1,21 +1,23 @@
 <template>
-    <div>
-      <h1 class="">Página Inicial</h1>
-      <p>Bem-vindo ao Vue Router no Electron!</p>
-      <router-link to="/about">Ir para Sobre</router-link>
+  <div class="grid grid-cols-3 px-5">
+    <div class="col-span-3" v-for="(item, index) in folders" :key="index">
+      <CardProgram :name="item.name" :started="item.started" :type="item.type" />
     </div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, reactive, ref } from "vue";
+import CardProgram from "./CardProgram.vue";
+
+const folders = ref([]);
 
 onMounted(async () => {
-  const d = await window.electronAPI.getFolders();
-  console.log(d);
-})
+  folders.value = await window.electronAPI.getFolders();
+
+  console.log(folders.value);
+  
+});
 </script>
 
-<style lang="scss" scoped>
-
-</style>
-
+<style lang="scss" scoped></style>
