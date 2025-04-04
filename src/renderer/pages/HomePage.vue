@@ -22,7 +22,11 @@
       </div>
     </div>
 
-    <div class="col-span-3" v-for="(item, index) in folders" :key="index">
+    <div
+      class="col-span-3"
+      v-for="(item, index) in store.projects"
+      :key="index"
+    >
       <CardProgram
         :name="item.name"
         :started="item.started"
@@ -34,8 +38,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
+import { useFoldersStore } from "../stores/foldersStore";
+
 import CardProgram from "../components/CardProgram.vue";
+
+const store = useFoldersStore();
+
+onMounted(() => {});
 </script>
 
 <style lang="scss" scoped></style>

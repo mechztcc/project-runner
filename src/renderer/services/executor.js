@@ -115,3 +115,43 @@ export async function onOpenFolder() {
 
   return result.filePaths[0] 
 }
+
+
+
+export async function getFoldersInDev(p) {
+  const devPath = path.join(p);
+
+  try {
+    const folders = fs
+      .readdirSync(devPath)
+      .filter((file) => fs.statSync(path.join(devPath, file)).isDirectory())
+      .map((folder) => {
+        const folderPath = path.join(devPath, folder);
+        const packageJsonPath = path.join(folderPath, "package.json");
+
+        const isJS = fs.existsSync(path.join(folderPath, "package.json"));
+        const isPython = fs.existsSync(path.join(folderPath, "manage.py"));
+        const isFlutter = fs.existsSync(path.join(folderPath, "pubspec.yaml"));
+
+        let scripts = [];
+        if (isJS) {
+          const packageJson = JSON.parse(
+            fs.readFileSync(packageJsonPath, "utf8")
+          );
+          scripts = packageJson.scripts ? Object.keys(packageJson.scripts) : [];
+        }
+
+        return {
+          name: folder,
+          started: false,
+          type: isJS ? "JS" : isPython ? "PY" : isFlutter ? "DART" : "Unknown",
+          scripts,
+        };
+      });
+
+    return folders;
+  } catch (error) {
+    console.error("Erro ao ler a pasta:", error);
+    return [];
+  }
+}

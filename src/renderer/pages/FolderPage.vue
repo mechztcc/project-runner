@@ -1,38 +1,46 @@
 <template>
-  <div class="flex flex-col px-5 py-5 mx-5 my-3 bg-zinc-100 rounded-lg ">
+  <div class="flex flex-col px-5 py-5 mx-5 my-3 bg-zinc-100 rounded-lg">
     <h1 class="text-xl"><b>Gerencie seus projetos com facilidade</b></h1>
-    <span class="text-zinc-800 text-md">Arraste e solte uma pasta de projetos ou clique para selecionar</span>
+    <span class="text-zinc-800 text-md"
+      >Arraste e solte uma pasta de projetos ou clique para selecionar</span
+    >
 
-
-    <div @click="onSelect()" class="flex flex-col items-center justify-center px-10 py-10 border-dashed border-2 border-zinc-200 rounded-lg w-full mt-10 cursor-pointer">
-      <font-awesome-icon :icon="['fas', 'folder']" class="text-4xl text-zinc-400"/>
+    <div
+      @click="onSelect()"
+      class="flex flex-col items-center justify-center px-10 py-10 border-dashed border-2 border-zinc-200 rounded-lg w-full mt-10 cursor-pointer"
+    >
+      <font-awesome-icon
+        :icon="['fas', 'folder']"
+        class="text-4xl text-zinc-400"
+      />
       <span class="text-zinc-800">Selecionar pasta</span>
-      <small class="text-sm" v-if="folder"><u>{{ folder }}</u></small>
-
-      
+      <small class="text-sm" v-if="store.mainFolderPath"
+        ><u>{{ store.mainFolderPath }}</u></small
+      >
     </div>
 
     <div class="flex justify-end mt-5">
-      <button class="bg-green-300 text-zinc-50 rounded-lg px-5 py-3 hover:bg-green-400 cursor-pointer"><b>Salvar</b></button>
+      <button
+        class="bg-green-300 text-zinc-50 rounded-lg px-5 py-3 hover:bg-green-400 cursor-pointer"
+      >
+        <b>Salvar</b>
+      </button>
     </div>
   </div>
 </template>
 
-
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
+import { useFoldersStore } from "../stores/foldersStore";
 
-const folder = ref(null);
+const store = useFoldersStore();
+
 
 async function onSelect(event: Event) {
-  const folderPath = await window.electronAPI.selectFolder()
+  const folderPath = await window.electronAPI.selectFolder();
   if (folderPath) {
-    folder.value = folderPath
-    const folders = await window.electronAPI.getFolders();
-    
+    store.mainFolderPath = folderPath;
+    store.projects =  await window.electronAPI.getFolders(folderPath);
   }
-
 }
-
-
 </script>
