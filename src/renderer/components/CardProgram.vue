@@ -88,7 +88,8 @@ async function runScript(script: string) {
 
 async function stopScript() {
   if (props.type == "JS") {
-    await window.electronAPI.stopScript(props.name);
+    const result = await window.electronAPI.stopScript(props.name);
+    started.value = false;
   }
 }
 </script>
