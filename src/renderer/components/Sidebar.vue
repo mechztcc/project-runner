@@ -39,6 +39,14 @@ const items = ref([
     },
     active: () => route.path === "/projects",
   },
+  {
+    label: "Iniciados",
+    icon: ['fas', 'play'],
+    navigate: () => {
+      router.push("/projects");
+    },
+    active: () => route.path === "/started",
+  },
 ]);
 </script>
 

@@ -11,6 +11,9 @@ import {
   faCircleNotch,
   faPause,
   faFolder,
+  faGrip,
+  faGripLines,
+  faArrowUpZA
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -31,7 +34,10 @@ library.add(
   faDartLang,
   faCircleNotch,
   faPause,
-  faFolder
+  faFolder,
+  faGrip,
+  faGripLines,
+  faArrowUpZA
 );
 
 export default (app) => {
