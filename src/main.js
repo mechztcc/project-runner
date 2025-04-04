@@ -1,7 +1,7 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const { runFromNodeEnv, stopScript } = require("./renderer/services/executor");
+const { runFromNodeEnv, stopScript, onOpenFolder } = require("./renderer/services/executor");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -29,8 +29,8 @@ function createWindow() {
   }
 }
 
-function getFoldersInDev() {
-  const devPath = path.join("/home/alberto/dev");
+function getFoldersInDev(path) {
+  const devPath = path.join(path);
 
   try {
     const folders = fs
@@ -69,8 +69,8 @@ function getFoldersInDev() {
 
 app.whenReady().then(createWindow);
 
-ipcMain.handle("get-folders", () => {
-  return getFoldersInDev();
+ipcMain.handle("get-folders", (_event, path) => {
+  return getFoldersInDev(path);
 });
 
 ipcMain.handle("run-script", (_event, projectName, scriptName) => {
@@ -80,3 +80,7 @@ ipcMain.handle("run-script", (_event, projectName, scriptName) => {
 ipcMain.handle("stop-script", (_event, projectName) => {
   return stopScript(projectName);
 });
+
+ipcMain.handle('select-folder', async () => {
+  return onOpenFolder();
+})

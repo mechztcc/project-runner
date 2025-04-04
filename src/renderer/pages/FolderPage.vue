@@ -4,10 +4,12 @@
     <span class="text-zinc-800 text-md">Arraste e solte uma pasta de projetos ou clique para selecionar</span>
 
 
-
-    <div class="flex flex-col items-center justify-center px-10 py-10 border-dashed border-2 border-zinc-200 rounded-lg w-full mt-10 cursor-pointer">
+    <div @click="onSelect()" class="flex flex-col items-center justify-center px-10 py-10 border-dashed border-2 border-zinc-200 rounded-lg w-full mt-10 cursor-pointer">
       <font-awesome-icon :icon="['fas', 'folder']" class="text-4xl text-zinc-400"/>
       <span class="text-zinc-800">Selecionar pasta</span>
+      <small class="text-sm" v-if="folder"><u>{{ folder }}</u></small>
+
+      
     </div>
 
     <div class="flex justify-end mt-5">
@@ -15,3 +17,22 @@
     </div>
   </div>
 </template>
+
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const folder = ref(null);
+
+async function onSelect(event: Event) {
+  const folderPath = await window.electronAPI.selectFolder()
+  if (folderPath) {
+    folder.value = folderPath
+    const folders = await window.electronAPI.getFolders();
+    
+  }
+
+}
+
+
+</script>

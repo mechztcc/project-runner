@@ -1,4 +1,5 @@
 import { spawn, exec, execSync } from "child_process";
+import { dialog } from 'electron'
 import path from "path";
 import fs from "fs";
 
@@ -40,8 +41,6 @@ export async function runFromNodeEnv(project, scriptName) {
 export async function stopScript(project) {
   const pid = runningProcesses.get(project);
   const processByPort = await listProcesses();
-  console.log(processByPort);
-  console.log(pid);
 
   killProcessOnPort('4200');
 
@@ -104,4 +103,15 @@ function killProcessOnPort(port) {
   } catch (error) {
     console.error(`Erro ao matar processo na porta ${port}:`, error);
   }
+}
+
+
+export async function onOpenFolder() {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  })
+
+  if (result.canceled || result.filePaths.length === 0) return null
+
+  return result.filePaths[0] 
 }
