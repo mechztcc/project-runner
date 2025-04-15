@@ -2,6 +2,7 @@ import { spawn, exec, execSync } from "child_process";
 import { dialog } from 'electron'
 import path from "path";
 import fs from "fs";
+import kill from 'tree-kill';
 
 const runningProcesses = new Map();
 
@@ -24,7 +25,7 @@ export async function runFromNodeEnv(project, scriptName) {
       cwd: folderPath,
       shell: true,
       stdio: "inherit",
-      detached: true,
+      detached: true
     });
 
     runningProcesses.set(project, process.pid);
@@ -40,19 +41,20 @@ export async function runFromNodeEnv(project, scriptName) {
 
 export async function stopScript(project) {
   const pid = runningProcesses.get(project);
-  const processByPort = await listProcesses();
 
-  killProcessOnPort('4200');
-
-  if (pid) {
-    process.kill(-pid);
-    runningProcesses.delete(project);
-    console.log(`Script do projeto ${project} interrompido.`);
-    return { success: true, message: "Script interrompido com sucesso" };
-  } else {
-    console.warn(`Nenhum script em execução para o projeto ${project}.`);
-    return { success: false, message: "Nenhum script para interromper" };
+  if (!pid) {
+    console.warn(`Nenhum PID registrado para o projeto ${project}`);
+    return;
   }
+
+  kill(pid, 'SIGTERM', (err) => {
+    if (err) {
+      console.error(`Erro ao encerrar processo ${pid}:`, err.message);
+    } else {
+      console.log(`Processo ${pid} (e filhos) encerrado com sucesso.`);
+      runningProcesses.delete(project);
+    }
+  });
 }
 
 export function listProcesses() {
